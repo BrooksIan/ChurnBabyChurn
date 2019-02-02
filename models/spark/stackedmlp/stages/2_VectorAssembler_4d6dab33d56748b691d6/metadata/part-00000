@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.VectorAssembler","timestamp":1549070830418,"sparkVersion":"2.3.0.2.6.5.0-292","uid":"VectorAssembler_4d6dab33d56748b691d6","paramMap":{"outputCol":"features","inputCols":["RF_Prediction","GBT_Prediction","SVM_Prediction"]}}
