@@ -23,10 +23,15 @@ This Github repo is designed to be optmized for Cloudera Data Science Workbench 
 
 In this project, there are 5 different supervised classifer models designed for telco customer churn.  The first four classsifer models user are: Random Forest, Gradient Boost Tree, Suport Vector Machines, and Multilayer Perception.  The most sucessful model is a Stacked Ensemble Model.    
 
-## Pre-Run Instructions
+## CDSW Run Instructions
 
-1.  In CSDW, download the project
-2. 
-3. 
-4.
+1.  In CSDW, download the project using the git url 
+2.  Open a new session, and execute the setup.sh file
+3.  In Expirments, run jobs for scripts
+  * dsforteko_pyspark.py  - vanilla random forest churn model
+  * gbt_churn_pyspark.py  - gradient boost tree churn model with normamlized variables, hyperturning, and crossvalidation
+  * mlp_churn_pyspark.py  - multilayer perceptron churn model with normamlized variables, hyperturning, and crossvalidation
+  * RF_churn_pyspark.py  -  random forest churn model with normamlized variables, hyperturning, and crossvalidation
+  * SVM_churn_pyspark.py -  support vection machine churn model with normamlized variables, hyperturning, and crossvalidation
+4. Once all experiments have completed, the stacked ensemble classifer model be built. 
 5. 
