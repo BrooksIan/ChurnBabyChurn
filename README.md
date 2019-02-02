@@ -34,7 +34,7 @@ In this project, there are 5 different supervised classifer models designed for 
     * mlp_churn_pyspark.py  - multilayer perceptron churn model with normamlized variables, hyperturning, and crossvalidatio
     * RF_churn_pyspark.py  -  random forest churn model with normamlized variables, hyperturning, and crossvalidation
     * SVM_churn_pyspark.py -  support vection machine churn model with normamlized variables, hyperturning, and crossvalidation
-4. Once all experiments have completed, the stacked ensemble classifer model be built. run the following script
+4. Once all experiments have completed, the stacked ensemble classifer model be built, run the following script to build the stacked model.
    * stacked_churn_pyspark.py - stacked ensemble model trained on the prediction of random forest, gradient boost tree, and support vector machine 
-5. Once the stacked experiment has been completed, the stacked model can be deployed using the following script.
+5. Once the stacked model has been built, the stacked model can be deployed using the following script. 
    * predict_churn_stackedMLP_pyspark.py
