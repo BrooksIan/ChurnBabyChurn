@@ -41,49 +41,34 @@ label_indexer = StringIndexer(inputCol = 'churned', outputCol = 'label')
 plan_indexer = StringIndexer(inputCol = 'intl_plan', outputCol = 'intl_plan_indexed')
 input_cols=['intl_plan_indexed'] + reduced_numeric_cols1
 
-
 #Feature Vector Assembler
 assembler = VectorAssembler(inputCols = input_cols, outputCol = 'features')
-
-#Standard Scaler
-scaler = StandardScaler(inputCol="features", outputCol="scaledFeatures",withStd=True, withMean=False)
 
 #Configure Random Forest Classifier Model 
 from pyspark.ml import Pipeline
 from pyspark.ml.classification import RandomForestClassifier
 
-rfclassifier = RandomForestClassifier(labelCol = 'label', featuresCol = 'scaledFeatures')
+rfclassifier = RandomForestClassifier(labelCol = 'label', featuresCol = 'features', numTrees=15)
 
 #Set Random Forest Pipeline Stages
-pipeline = Pipeline(stages=[plan_indexer, label_indexer, assembler, scaler, rfclassifier])
+pipeline = Pipeline(stages=[plan_indexer, label_indexer, assembler, rfclassifier])
+
+#Split Test and Training Set
 (train, test) = churn_data.randomSplit([0.75, 0.25])
 
-
-#Spark Model Hyper Turning
-from pyspark.ml.tuning import CrossValidator
-from pyspark.ml.tuning import ParamGridBuilder
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 
-#Setting Random Forest Paramaters From Users
-user_rf_param_numTreeSet = [5, 10, 20, 40, 80]
-user_rf_param_maxDepthSet = [10, 20, 30]
-user_rf_param_impuritySet = ['gini', 'entropy']
-user_rf_param_numFolds = 2
-
-#Settings for Random Forest - Paramaters Grid Search 
-rf_paramGrid = ParamGridBuilder().addGrid(classifier.numTrees, user_rf_param_numTreeSet).addGrid(classifier.maxDepth, user_rf_param_maxDepthSet).addGrid(classifier.impurity, user_rf_param_impuritySet).build()
 evaluator = BinaryClassificationEvaluator()
 multiEvaluator = MulticlassClassificationEvaluator()
 
 #Setting Paramaters for Crossvalidation 
-rf_cv = CrossValidator( estimator=pipeline, evaluator=evaluator, estimatorParamMaps=rf_paramGrid, numFolds=user_rf_param_numFolds)
-rf_cvmodel = rf_cv.fit(train)
+rf_model = pipeline.fit(train)
 
 #Evaluating Random Forest Model Performance 
 from pyspark.sql.functions import udf
 
-rf_predictions = rf_cvmodel.transform(test)
+rf_predictions = rf_model.transform(test)
 auroc = evaluator.evaluate(rf_predictions, {evaluator.metricName: "areaUnderROC"})
 aupr = evaluator.evaluate(rf_predictions, {evaluator.metricName: "areaUnderPR"})
 "The AUROC is %s and the AUPR is %s" % (auroc, aupr)
@@ -94,17 +79,11 @@ weightedRecall = multiEvaluator.evaluate(rf_predictions, {multiEvaluator.metricN
 
 "The F1 score: %s the Weighted Precision: %s the Weighted Recall is %s" % (f1score, weightedPrecision, weightedRecall)
 
-#Select the Random Forest Best Model after Crossvalidation
-rfmodel = rf_cvmodel.bestModel 
-bestRFModel = rfmodel.stages[-1]
-
 #Retrieving Paramaters from the Best RF Model 
-param_BestModel_NumTrees = bestRFModel._java_obj.getNumTrees()
-param_BestModel_Depth = bestRFModel._java_obj.getMaxDepth()
-param_BestModel_impurity = bestRFModel._java_obj.getImpurity()
+param_BestModel_NumTrees = 10
 
 #Feature Importance
-impFeatures = model.stages[-1].featureImportances
+impFeatures = rf_model.stages[-1].featureImportances
 zipFeaturesToImportanceValue = zip(impFeatures, input_cols)
 FeautureRankings = set(zipFeaturesToImportanceValue)
 sortedFeaturRankings = sorted(FeautureRankings, reverse=True)
@@ -119,51 +98,21 @@ cdsw.track_metric("F1", f1score)
 cdsw.track_metric("WeightedPrecision", weightedPrecision)
 cdsw.track_metric("weightedRecall", weightedRecall)
 cdsw.track_metric("numTrees",param_BestModel_NumTrees)
-cdsw.track_metric("maxDepth",param_BestModel_Depth)
-cdsw.track_metric("impurity",param_BestModel_impurity)
-cdsw.track_metric("cvFolds",user_rf_param_numFolds)
-
-
+y
 from pyspark.mllib.evaluation import BinaryClassificationMetrics
 rf_labelPredictionSet = rf_predictions.select('prediction','label').rdd.map(lambda lp: (lp.prediction, lp.label))
 rfmetrics = BinaryClassificationMetrics(rf_labelPredictionSet)
 
-
-#Configure Gradient Boost Tree Classifier Model 
-from pyspark.ml.classification import GBTClassifier
-gbtclassifier = GBTClassifier(labelCol = 'label', featuresCol = 'scaledFeatures')
-
-#Set GTB Pipeline Stages
-GBTpipeline = Pipeline(stages=[plan_indexer, label_indexer, assembler, scaler, gbtclassifier])
-
-#Setting GBT Paramaters From Users
-user_gbt_param_numInterSet = [1, 2, 3, 4, 5]
-user_gbt_param_maxDepthSet = [10, 20, 30]
-user_gbt_param_numFolds = 2
-
-
-#Settings for GBT - Paramaters Grid Search 
-GBTparamGrid = ParamGridBuilder().addGrid(gbtclassifier.maxIter, user_gbt_param_numInterSet).addGrid(gbtclassifier.maxDepth, user_gbt_param_maxDepthSet).build()
-#evaluator = BinaryClassificationEvaluator()
-#multiEvaluator = MulticlassClassificationEvaluator()
-
-#Setting Paramaters for Crossvalidation 
-gbt_cv = CrossValidator( estimator=pipeline, evaluator=evaluator, estimatorParamMaps=paramGrid, numFolds=user_param_numFolds)
-gbt_cvmodel = gbt_cv.fit(train)
-
-
-
-
-
 #Save Stacked Model to Disk
-#rfmodel.write().overwrite().save("models/spark")
+
+rf_model.write().overwrite().save("models/spark/vanilla")
 
 !rm -r -f models/spark
-!rm -r -f models/spark_rf.tar
+!rm -r -f models/spark_rf_vanilla.tar
 !hdfs dfs -get models/spark 
 !hdfs dfs -get models/
-!tar -cvf models/spark_rf.tar models/spark
+!tar -cvf models/spark_rf._vanilla.tar models/spark/vanilla
 
-cdsw.track_file("models/spark_rf.tar")
+cdsw.track_file("models/spark_rf_vanilla.tar")
 
 spark.stop()
