@@ -11,9 +11,9 @@
 
 **Author**: Ian Brooks
 
-**Follow**: [LinkedIn - Ian Brooks PhD] (https://www.linkedin.com/in/ianrbrooksphd/)
+**Follow**: [LinkedIn - Ian Brooks PhD](https://www.linkedin.com/in/ianrbrooksphd/)
 
-**Orginal Fork From**: [CDSW Demo]  (https://github.infra.cloudera.com/SE-SPEC-DPML/dsfortelcoCDSW) 
+**Orginal Fork From**: [CDSW Demo](https://github.infra.cloudera.com/SE-SPEC-DPML/dsfortelcoCDSW) 
 
 ## Churn Baby Churn 
 
@@ -25,7 +25,7 @@ In this project, there are 5 different supervised classifer models designed for 
 
 ## CDSW Run Instructions
 
-1.  In CSDW, download the project using the git url for [here] (https://github.com/BrooksIan/ChurnBabyChurn.git) 
+1.  In CSDW, download the project using the git url for [here](https://github.com/BrooksIan/ChurnBabyChurn.git) 
 2.  Open a new session, and execute the setup.sh file
 3.  In Expirments, run the following scripts
     * dsforteko_pyspark.py  - vanilla random forest churn model
