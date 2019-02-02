@@ -12,9 +12,11 @@
 **Follow** [LinkedIn - Ian Brooks PhD] (https://www.linkedin.com/in/ianrbrooksphd/)
 **Orginal Fork From** [CDSW Demo]  (https://github.infra.cloudera.com/SE-SPEC-DPML/dsfortelcoCDSW) 
 
-## Churn Anyway You Want it? 
+## Churn Baby Churn 
 
 ![churn](https://blog.aircall.io/wp-content/uploads/2017/03/customer-churn.png "churn")
+
+This Github repo is designed to be optmized for Cloudera Data Science Workbench (CDSW), but it is not required.  The PySpark code can be used with the included dataset.  
 
 ## Pre-Run Instructions
 
