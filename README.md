@@ -28,11 +28,11 @@ In this project, there are 5 different supervised classifer models designed for 
 1.  In CSDW, download the project using the git url 
 2.  Open a new session, and execute the setup.sh file
 3.  In Expirments, run the following scripts
-   * dsforteko_pyspark.py  - vanilla random forest churn model
-   * gbt_churn_pyspark.py  - gradient boost tree churn model with normamlized variables, hyperturning, and crossvalidation
-   * mlp_churn_pyspark.py  - multilayer perceptron churn model with normamlized variables, hyperturning, and crossvalidatio
-   * RF_churn_pyspark.py  -  random forest churn model with normamlized variables, hyperturning, and crossvalidation
-   * SVM_churn_pyspark.py -  support vection machine churn model with normamlized variables, hyperturning, and crossvalidation
+    * dsforteko_pyspark.py  - vanilla random forest churn model
+    * gbt_churn_pyspark.py  - gradient boost tree churn model with normamlized variables, hyperturning, and crossvalidation
+    * mlp_churn_pyspark.py  - multilayer perceptron churn model with normamlized variables, hyperturning, and crossvalidatio
+    * RF_churn_pyspark.py  -  random forest churn model with normamlized variables, hyperturning, and crossvalidation
+    * SVM_churn_pyspark.py -  support vection machine churn model with normamlized variables, hyperturning, and crossvalidation
 4. Once all experiments have completed, the stacked ensemble classifer model be built. run the following script
    * stacked_churn_pyspark.py - stacked ensemble model trained on the prediction of random forest, gradient boost tree, and support vector machine 
 5. Once the stacked experiment has been completed, the stacked model can be deployed using the following script.
