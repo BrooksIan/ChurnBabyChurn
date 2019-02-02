@@ -20,7 +20,7 @@
 
 ![churn](https://blog.aircall.io/wp-content/uploads/2017/03/customer-churn.png "churn")
 
-This Github repo is designed to be optmized for Cloudera Data Science Workbench (CDSW), but it is not required.  The PySpark code can be used with Apache Spark, and the code examples wil run with the included dataset.
+This Github repo is designed to be optmized for Cloudera Data Science Workbench (CDSW), but it is not required.  The PySpark code can be used with Apache Spark, and the code examples will run with the included dataset.
 
 In this project, there are 5 different supervised classifer models designed for telco customer churn.  The first four classsifer models user are: Random Forest, Gradient Boost Tree, Suport Vector Machines, and Multilayer Perception.  The most sucessful model is a Stacked Ensemble Model.    
 
