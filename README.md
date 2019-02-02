@@ -1,6 +1,6 @@
 ## Data Science in Apache Py-Spark
 ### Customer Churn Project
-#### Ensemable Models
+#### Ensemble Models
 
 **Level**: Moderate
 
