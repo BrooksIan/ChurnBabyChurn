@@ -3,13 +3,16 @@
 #### Ensemable Models
 
 **Level**: Moderate
-**Language**: Pythn
+**Language**: Python
+
 **Requirements**: 
 - HDP + CDSW 
 - Spark 2.3
 
 **Author**: Ian Brooks
+
 **Follow**: [LinkedIn - Ian Brooks PhD] (https://www.linkedin.com/in/ianrbrooksphd/)
+
 **Orginal Fork From**: [CDSW Demo]  (https://github.infra.cloudera.com/SE-SPEC-DPML/dsfortelcoCDSW) 
 
 ## Churn Baby Churn 
