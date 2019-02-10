@@ -117,7 +117,7 @@ from pyspark.mllib.evaluation import BinaryClassificationMetrics
 labelPredictionSet = svm_predictions.select('prediction','label').rdd.map(lambda lp: (lp.prediction, lp.label))
 metrics = BinaryClassificationMetrics(labelPredictionSet)
 
-#Save RF Model to Disk
+#Save SVM Model to Disk
 svmModel.write().overwrite().save("models/spark/svm")
 
 !rm -r -f models/spark/svm
