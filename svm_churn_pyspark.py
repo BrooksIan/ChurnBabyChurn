@@ -118,7 +118,7 @@ labelPredictionSet = svm_predictions.select('prediction','label').rdd.map(lambda
 metrics = BinaryClassificationMetrics(labelPredictionSet)
 
 #Save RF Model to Disk
-rfmodel.write().overwrite().save("models/spark/svm")
+svmModel.write().overwrite().save("models/spark/svm")
 
 !rm -r -f models/spark/svm
 !rm -r -f models/spark_svm.tar
