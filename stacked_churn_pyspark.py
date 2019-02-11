@@ -7,7 +7,8 @@ import pandas as pd
 import cdsw
 
 spark = SparkSession.builder \
-      .appName("Telco Customer Churn") \
+      .appName("Telco Customer Churn - Stacked MLP") \
+      .config('spark.shuffle.service.enabled',"True") \
       .master("local[*]") \
       .getOrCreate()
 
