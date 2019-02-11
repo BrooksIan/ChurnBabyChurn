@@ -7,6 +7,7 @@ import cdsw
 #initalize Spark Session 
 spark = SparkSession.builder \
       .appName("Telco Customer Churn") \
+      .config('spark.shuffle.service.enabled',"True") \
       .getOrCreate()
 
 #Define Dataframe Schema     
