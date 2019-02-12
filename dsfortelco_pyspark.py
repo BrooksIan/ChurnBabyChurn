@@ -7,6 +7,7 @@ import cdsw
 #initalize Spark Session 
 spark = SparkSession.builder \
       .appName("Telco Customer Churn") \
+      .config('spark.shuffle.service.enabled',"True") \
       .getOrCreate()
 
 #Define Dataframe Schema     
@@ -98,7 +99,7 @@ cdsw.track_metric("F1", f1score)
 cdsw.track_metric("WeightedPrecision", weightedPrecision)
 cdsw.track_metric("weightedRecall", weightedRecall)
 cdsw.track_metric("numTrees",param_BestModel_NumTrees)
-y
+
 from pyspark.mllib.evaluation import BinaryClassificationMetrics
 rf_labelPredictionSet = rf_predictions.select('prediction','label').rdd.map(lambda lp: (lp.prediction, lp.label))
 rfmetrics = BinaryClassificationMetrics(rf_labelPredictionSet)

@@ -6,7 +6,8 @@ import cdsw
 
 #initalize Spark Session 
 spark = SparkSession.builder \
-      .appName("Telco Customer Churn") \
+      .appName("Telco Customer Churn SVM") \
+      .config('spark.shuffle.service.enabled',"True") \
       .getOrCreate()
 
 #Define Dataframe Schema     
@@ -117,8 +118,8 @@ from pyspark.mllib.evaluation import BinaryClassificationMetrics
 labelPredictionSet = svm_predictions.select('prediction','label').rdd.map(lambda lp: (lp.prediction, lp.label))
 metrics = BinaryClassificationMetrics(labelPredictionSet)
 
-#Save RF Model to Disk
-rfmodel.write().overwrite().save("models/spark/svm")
+#Save SVM Model to Disk
+svmModel.write().overwrite().save("models/spark/svm")
 
 !rm -r -f models/spark/svm
 !rm -r -f models/spark_svm.tar
