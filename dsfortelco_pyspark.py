@@ -112,7 +112,7 @@ rf_model.write().overwrite().save("models/spark/vanilla")
 !rm -r -f models/spark_rf_vanilla.tar
 !hdfs dfs -get models/spark 
 !hdfs dfs -get models/
-!tar -cvf models/spark_rf._vanilla.tar models/spark/vanilla
+!tar -cvf models/spark_rf_vanilla.tar models/spark/vanilla
 
 cdsw.track_file("models/spark_rf_vanilla.tar")
 
