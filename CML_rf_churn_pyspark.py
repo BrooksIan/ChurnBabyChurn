@@ -136,6 +136,5 @@ metrics = BinaryClassificationMetrics(labelPredictionSet)
 #Save RF Model to S3
 rfmodel.write().save("s3a://ibrooks008-cdp-bucket/ibrooks008-dl/model_output/spark/rf")
 
-cdsw.track_file("models/spark_rf.tar")
-
+#Stop Spark
 spark.stop()
