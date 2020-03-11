@@ -4,7 +4,6 @@ from pyspark.ml import PipelineModel
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType
 
 spark = SparkSession.builder \
-      .master("local[*]") \
       .appName("Telco Customer Churn RF") \
       .config("spark.hadoop.fs.s3a.s3guard.ddb.region","us-east-1") \
       .config("spark.yarn.access.hadoopFileSystems","s3a://ibrooks008-cdp-bucket") \
