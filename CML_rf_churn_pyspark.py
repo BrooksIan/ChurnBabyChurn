@@ -129,22 +129,12 @@ cdsw.track_metric("maxDepth",param_BestModel_Depth)
 cdsw.track_metric("impurity",param_BestModel_impurity)
 cdsw.track_metric("cvFolds",user_rf_param_numFolds)
 
-#!klist 
-
 from pyspark.mllib.evaluation import BinaryClassificationMetrics
 labelPredictionSet = rf_predictions.select('prediction','label').rdd.map(lambda lp: (lp.prediction, lp.label))
 metrics = BinaryClassificationMetrics(labelPredictionSet)
 
-#Save RF Model to Disk
-# rfmodel.write().overwrite().save("models/spark/rf")
-
+#Save RF Model to S3
 rfmodel.write().save("s3a://ibrooks008-cdp-bucket/ibrooks008-dl/model_output/spark/rf")
-
-#!rm -r -f models/spark/rf
-#!rm -r -f models/spark_rf.tar
-#!hdfs dfs -get models/spark/rf 
-#!hdfs dfs -get models/
-#!tar -cvf models/spark_rf.tar models/spark/rf
 
 cdsw.track_file("models/spark_rf.tar")
 
