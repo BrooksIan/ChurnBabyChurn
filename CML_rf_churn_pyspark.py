@@ -134,7 +134,7 @@ labelPredictionSet = rf_predictions.select('prediction','label').rdd.map(lambda 
 metrics = BinaryClassificationMetrics(labelPredictionSet)
 
 #Save RF Model to S3
-rfmodel.write().save("s3a://ibrooks008-cdp-bucket/ibrooks008-dl/model_output/spark/rf")
+rfmodel.write().overwrite().save("s3a://ibrooks008-cdp-bucket/ibrooks008-dl/model_output/spark/rf")
 
 #Stop Spark
 spark.stop()
