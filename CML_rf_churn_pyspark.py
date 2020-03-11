@@ -138,7 +138,7 @@ metrics = BinaryClassificationMetrics(labelPredictionSet)
 #Save RF Model to Disk
 # rfmodel.write().overwrite().save("models/spark/rf")
 
-rfmodel.write().overwrite().save("s3a://ibrooks008-cdp-bucket/ibrooks008-dl/model_output/spark/rf")
+rfmodel.write().save("s3a://ibrooks008-cdp-bucket/ibrooks008-dl/model_output/spark/rf")
 
 #!rm -r -f models/spark/rf
 #!rm -r -f models/spark_rf.tar
