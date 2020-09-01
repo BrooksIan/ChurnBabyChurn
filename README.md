@@ -18,7 +18,7 @@
 
 ## Churn Baby Churn 
 
-![churn](https://blog.aircall.io/wp-content/uploads/2017/03/customer-churn.png "churn")
+![churn](Churn.jpeg "churn")
 
 This Github repo is designed to be optmized for Cloudera Data Science Workbench (CDSW), but it is not required.  The PySpark code can be used with Apache Spark, and the code examples will run with the included dataset.
 
