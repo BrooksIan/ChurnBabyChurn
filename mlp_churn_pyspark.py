@@ -1,20 +1,30 @@
+## Spark ML - Multilayer Perceptron
+
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 from pyspark.sql.functions import trim
 import pandas as pd
 import cdsw
+import time
+import sys 
 
 #initalize Spark Session 
 spark = SparkSession.builder \
-      .appName("Telco Customer Churn- MLP") \
-      .config('spark.shuffle.service.enabled',"True") \
+      .appName("Churn- MLP") \
+      .master("local[*]") \
       .getOrCreate()
 
+## Spark Version    
+spark.version
+
+### Start Timer
+startTime = time.process_time()      
+      
 #Define Dataframe Schema     
 schemaData = StructType([StructField("state", StringType(), True),StructField("account_length", DoubleType(), True),StructField("area_code", StringType(), True),StructField("phone_number", StringType(), True),StructField("intl_plan", StringType(), True),StructField("voice_mail_plan", StringType(), True),StructField("number_vmail_messages", DoubleType(), True),     StructField("total_day_minutes", DoubleType(), True),     StructField("total_day_calls", DoubleType(), True),     StructField("total_day_charge", DoubleType(), True),     StructField("total_eve_minutes", DoubleType(), True),     StructField("total_eve_calls", DoubleType(), True),     StructField("total_eve_charge", DoubleType(), True),     StructField("total_night_minutes", DoubleType(), True),     StructField("total_night_calls", DoubleType(), True),     StructField("total_night_charge", DoubleType(), True),     StructField("total_intl_minutes", DoubleType(), True),     StructField("total_intl_calls", DoubleType(), True),     StructField("total_intl_charge", DoubleType(), True),     StructField("number_customer_service_calls", DoubleType(), True),     StructField("churned", StringType(), True)])
 
 #Build Dataframe from File
-raw_data = spark.read.schema(schemaData).csv('/tmp/churn.all')
+raw_data = spark.read.schema(schemaData).csv('data/churn.all')
 churn_data=raw_data.withColumn("intl_plan",trim(raw_data.intl_plan))
 
 reduced_numeric_cols = ["account_length", "number_vmail_messages",
@@ -27,7 +37,7 @@ reduced_numeric_cols1 = ["account_length", "number_vmail_messages", "total_day_c
                         "total_night_calls", "total_night_charge", "total_intl_calls", 
                         "total_intl_charge","number_customer_service_calls"]
 
-#Review DataSet Balance 
+#Review Dataset Balance 
 churn_data.registerTempTable("ChurnData")
 sqlResult = spark.sql("SELECT churned, COUNT(churned) as Churned FROM ChurnData group by churned")
 sqlResult.show()
@@ -70,7 +80,7 @@ from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 user_mlp_param_layers = [ [12,12, 2], [12, 6, 2] ]
 user_mlp_param_maxIter = [10, 50, 100]
 user_mlp_param_blockSize = [1, 128, 256]
-user_mlp_param_numFolds = 2
+user_mlp_param_numFolds = 3
 
 #Settings for Multilayer Perceptron - Paramaters Grid Search 
 mlp_paramGrid = ParamGridBuilder().addGrid(mlpclassifier.layers, user_mlp_param_layers).addGrid(mlpclassifier.maxIter, user_mlp_param_maxIter).addGrid(mlpclassifier.blockSize, user_mlp_param_blockSize).build()
@@ -105,6 +115,10 @@ bestMLPModel = mlpmodel.stages[-1]
 #param_BestModel_Layers = bestMLPModel._java_obj.layers
 #param_BestModel_Iter = bestMLPModel._java_obj.maxIter
 
+### Stop Timer
+stopTime = time.process_time()
+elapsedTime = stopTime-startTime
+"Elapsed Process Time: %0.8f" % (elapsedTime)
 
 #Return Paramaters to CDSW User Intemlpace
 cdsw.track_metric("auroc", auroc)
@@ -115,7 +129,7 @@ cdsw.track_metric("weightedRecall", weightedRecall)
 #cdsw.track_metric("Layers",param_BestModel_Layers)
 #cdsw.track_metric("maxIter",param_BestModel_Iter)
 cdsw.track_metric("cvFolds",user_mlp_param_numFolds)
-
+cdsw.track_metric("ProcTime", elapsedTime)
 
 from pyspark.mllib.evaluation import BinaryClassificationMetrics
 labelPredictionSet = mlp_predictions.select('prediction','label').rdd.map(lambda lp: (lp.prediction, lp.label))
@@ -126,12 +140,8 @@ metrics = BinaryClassificationMetrics(labelPredictionSet)
 #Save MLP Model to Disk
 mlpmodel.write().overwrite().save("models/spark/mlp")
 
-!rm -r -f models/spark/mlp
-!rm -r -f models/spark_mlp.tar
-!hdfs dfs -get models/spark/mlp 
-!hdfs dfs -get models/
-!tar -cvf models/spark_mlp.tar models/spark/mlp
-
 cdsw.track_file("models/spark_mlp.tar")
 
 spark.stop()
+
+## End of File

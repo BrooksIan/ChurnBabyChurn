@@ -1,20 +1,31 @@
+## Spark ML Support Vector Machines
+
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 from pyspark.sql.functions import trim
 import pandas as pd
 import cdsw
+import time
+import sys 
 
 #initalize Spark Session 
 spark = SparkSession.builder \
-      .appName("Telco Customer Churn SVM") \
+      .appName("Churn - SVM") \
       .config('spark.shuffle.service.enabled',"True") \
+      .master("local[*]") \
       .getOrCreate()
 
+## Spark Version    
+spark.version
+
+### Start Timer
+startTime = time.process_time()         
+      
 #Define Dataframe Schema     
 schemaData = StructType([StructField("state", StringType(), True),StructField("account_length", DoubleType(), True),StructField("area_code", StringType(), True),StructField("phone_number", StringType(), True),StructField("intl_plan", StringType(), True),StructField("voice_mail_plan", StringType(), True),StructField("number_vmail_messages", DoubleType(), True),     StructField("total_day_minutes", DoubleType(), True),     StructField("total_day_calls", DoubleType(), True),     StructField("total_day_charge", DoubleType(), True),     StructField("total_eve_minutes", DoubleType(), True),     StructField("total_eve_calls", DoubleType(), True),     StructField("total_eve_charge", DoubleType(), True),     StructField("total_night_minutes", DoubleType(), True),     StructField("total_night_calls", DoubleType(), True),     StructField("total_night_charge", DoubleType(), True),     StructField("total_intl_minutes", DoubleType(), True),     StructField("total_intl_calls", DoubleType(), True),     StructField("total_intl_charge", DoubleType(), True),     StructField("number_customer_service_calls", DoubleType(), True),     StructField("churned", StringType(), True)])
 
 #Build Dataframe from File
-raw_data = spark.read.schema(schemaData).csv('/tmp/churn.all')
+raw_data = spark.read.schema(schemaData).csv('data/churn.all')
 churn_data=raw_data.withColumn("intl_plan",trim(raw_data.intl_plan))
 
 reduced_numeric_cols = ["account_length", "number_vmail_messages",
@@ -71,8 +82,8 @@ from pyspark.ml.evaluation import BinaryClassificationEvaluator
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 
 #Setting Random Forest Paramaters From Users
-user_svm_param_maxIter = [10, 20, 30]
-user_svm_param_numFolds = 2
+user_svm_param_maxIter = [16, 32, 64, 128]
+user_svm_param_numFolds = 3
 
 #Settings for Random Forest - Paramaters Grid Search 
 svm_paramGrid = ParamGridBuilder().addGrid(svmclassifier.maxIter, user_svm_param_maxIter).build()
@@ -104,6 +115,11 @@ bestSVMModel = svmModel.stages[-1]
 #Retrieving Paramaters from the Best RF Model 
 param_BestModel_Iter = bestSVMModel._java_obj.getMaxIter()
 
+### Stop Timer
+stopTime = time.process_time()
+elapsedTime = stopTime-startTime
+"Elapsed Process Time: %0.8f" % (elapsedTime)
+
 #Return Paramaters to CDSW User Interface
 cdsw.track_metric("auroc", auroc)
 cdsw.track_metric("aupr", aupr)
@@ -112,7 +128,7 @@ cdsw.track_metric("WeightedPrecision", weightedPrecision)
 cdsw.track_metric("weightedRecall", weightedRecall)
 cdsw.track_metric("maxIter",param_BestModel_Iter)
 cdsw.track_metric("cvFolds",user_svm_param_numFolds)
-
+cdsw.track_metric("ProcTime", elapsedTime)
 
 from pyspark.mllib.evaluation import BinaryClassificationMetrics
 labelPredictionSet = svm_predictions.select('prediction','label').rdd.map(lambda lp: (lp.prediction, lp.label))
@@ -121,12 +137,6 @@ metrics = BinaryClassificationMetrics(labelPredictionSet)
 #Save SVM Model to Disk
 svmModel.write().overwrite().save("models/spark/svm")
 
-!rm -r -f models/spark/svm
-!rm -r -f models/spark_svm.tar
-!hdfs dfs -get models/spark/svm
-!hdfs dfs -get models/
-!tar -cvf models/spark_svm.tar models/spark/svm
-
-cdsw.track_file("models/spark_svm.tar")
-
 spark.stop()
+
+## End of File
