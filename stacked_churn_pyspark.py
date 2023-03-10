@@ -45,7 +45,7 @@ joinFeatures = ["churned","phone_number","area_code","number_vmail_messages", "i
                                               "total_intl_calls","total_intl_charge","number_customer_service_calls"]
 
 #Create Dataframe from Churn Data
-raw_data = spark.read.schema(schemaData).csv('/tmp/churn.all')
+raw_data = spark.read.schema(schemaData).csv('file:///home/cdsw/data/churn.all')
 churn_data=raw_data.withColumn("intl_plan",trim(raw_data.intl_plan))
 
 #Spilt Test and Train Sets
